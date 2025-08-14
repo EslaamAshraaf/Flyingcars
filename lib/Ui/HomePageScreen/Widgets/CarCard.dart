@@ -31,7 +31,11 @@ class CarCardWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, CarDetails.routename);
+        Navigator.pushNamed(
+          context,
+          CarDetails.routename,
+          arguments: index,
+        );
       },
       child: Container(
         decoration: BoxDecoration(

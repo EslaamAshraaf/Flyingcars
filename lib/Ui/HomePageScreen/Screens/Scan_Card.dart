@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:card_scanner/card_scanner.dart';
 class ScanCard extends StatelessWidget {
   static const String routeName = "ScanCard";
 
@@ -68,7 +68,11 @@ class ScanCard extends StatelessWidget {
                               horizontal: 60,
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () async {
+                            var cardDetails = await CardScanner.scanCard();
+
+                            print(cardDetails);
+                          },
                           child: Text(
                             "Add Card",
                             style: TextStyle(color: Colors.white, fontSize: 16),
