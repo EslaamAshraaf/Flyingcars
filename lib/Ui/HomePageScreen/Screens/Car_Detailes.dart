@@ -1,3 +1,4 @@
+import 'package:carshop/Models/Data_Car.dart';
 import 'package:carshop/Ui/HomePageScreen/Screens/Add_Card.dart';
 
 import 'package:flutter/material.dart';
@@ -6,8 +7,8 @@ import 'HomePageScreen.dart';
 
 class CarDetails extends StatelessWidget {
   static const String routename = "CarDetails";
-  const CarDetails({super.key});
-
+  CarDetails({super.key});
+final Datacar datacar =Datacar();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +47,6 @@ class CarDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 50),
             Center(
               child: SizedBox(
                 width: 400,
@@ -57,7 +57,6 @@ class CarDetails extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
             const Padding(
               padding: EdgeInsets.only(left: 15),
               child: Text(
@@ -97,7 +96,7 @@ class CarDetails extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+
             const Text("Total Price", style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 5),
             Row(
