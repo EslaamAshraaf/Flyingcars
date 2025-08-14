@@ -6,8 +6,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../HomePageScreen/Screens/HomePageScreen.dart';
 
-
-
 class Register extends StatefulWidget {
   static const String routename = "Register";
   const Register({super.key});
@@ -17,7 +15,6 @@ class Register extends StatefulWidget {
 }
 
 void navigateBack(BuildContext context) {
-
   Navigator.pushReplacementNamed(context, LoginScreen.routename);
 }
 
@@ -47,12 +44,71 @@ class _RegisterState extends State<Register> {
     super.dispose();
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // Keep your current flow (you can wire Firebase email sign-up later)
+  Future<void> _submitForm() async {
+    // Close the keyboard
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+      // Optional: send email verification
+      await userCredential.user?.sendEmailVerification();
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Form is valid. Proceed to backend call.")),
+        const SnackBar(
+          content: Text(
+            "Registration successful! Please check your email for verification.",
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
       );
+
+      Navigator.pushReplacementNamed(context, HomePageScreen.routename);
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case "email-already-in-use":
+          errorMessage = "This email is already registered.";
+          break;
+        case "invalid-email":
+          errorMessage = "Invalid email address.";
+          break;
+        case "weak-password":
+          errorMessage = "Password should be at least 6 characters.";
+          break;
+        case "operation-not-allowed":
+          errorMessage = "Email/password accounts are not enabled.";
+          break;
+        default:
+          errorMessage = "Registration failed. Please try again.";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("An unexpected error occurred."),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -71,7 +127,8 @@ class _RegisterState extends State<Register> {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -81,9 +138,9 @@ class _RegisterState extends State<Register> {
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       // Success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sign-in successful!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Sign-in successful!")));
 
       // Navigate to homescreen
       Navigator.pushReplacementNamed(context, HomePageScreen.routename);
@@ -103,7 +160,8 @@ class _RegisterState extends State<Register> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom),
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -213,9 +271,11 @@ class _RegisterState extends State<Register> {
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.lock_outline_rounded),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
                         onPressed: _togglePasswordVisibility,
                       ),
                       hintText: "Enter New Password",
@@ -248,9 +308,11 @@ class _RegisterState extends State<Register> {
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.lock_outline_rounded),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
                         onPressed: _togglePasswordVisibility,
                       ),
                       hintText: "Confirm Password",
@@ -266,8 +328,7 @@ class _RegisterState extends State<Register> {
 
                 // Sign up Button
                 Padding(
-                  padding:
-                  const EdgeInsets.only(left: 20, right: 20, top: 40),
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 40),
                   child: SizedBox(
                     height: 50,
                     width: double.infinity,
@@ -293,8 +354,7 @@ class _RegisterState extends State<Register> {
                         child: const Center(
                           child: Text(
                             'Sign up',
-                            style: TextStyle(
-                                color: Colors.white, fontSize: 16),
+                            style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ),
                       ),
@@ -307,9 +367,11 @@ class _RegisterState extends State<Register> {
                 GestureDetector(
                   onTap: () {
                     Navigator.pushReplacementNamed(
-                        context, LoginScreen.routename);
+                      context,
+                      LoginScreen.routename,
+                    );
                   },
-                  child:  RichText(
+                  child: RichText(
                     text: TextSpan(
                       text: "Already have an account",
                       style: TextStyle(color: Colors.black, fontSize: 14),
@@ -331,8 +393,7 @@ class _RegisterState extends State<Register> {
                 // Social Media login (kept same design)
                 const SizedBox(height: 30),
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
                     children: const [
                       Expanded(
@@ -345,7 +406,9 @@ class _RegisterState extends State<Register> {
                       Text(
                         "Or sign in with",
                         style: TextStyle(
-                            color: Color(0xff131A34), fontSize: 16),
+                          color: Color(0xff131A34),
+                          fontSize: 16,
+                        ),
                       ),
                       Expanded(
                         child: Divider(
@@ -368,15 +431,21 @@ class _RegisterState extends State<Register> {
                         onPressed: _isLoading ? null : signInWithGoogle,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(157, 48),
-                          backgroundColor:
-                          const Color.fromRGBO(216, 216, 216, 0.05),
+                          backgroundColor: const Color.fromRGBO(
+                            216,
+                            216,
+                            216,
+                            0.05,
+                          ),
                         ),
                         child: _isLoading
                             ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
                             : const Text("Google"),
                       ),
                       // Facebook placeholder (unchanged)
@@ -384,8 +453,12 @@ class _RegisterState extends State<Register> {
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(157, 48),
-                          backgroundColor:
-                          const Color.fromRGBO(216, 216, 216, 0.05),
+                          backgroundColor: const Color.fromRGBO(
+                            216,
+                            216,
+                            216,
+                            0.05,
+                          ),
                         ),
                         child: const Text("Facebook"),
                       ),
