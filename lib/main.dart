@@ -8,11 +8,12 @@ import 'package:carshop/Ui/HomePageScreen/Screens/Scan_Card.dart';
 import 'package:carshop/Ui/Splash&Onboardning/splash.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'Firebase/firebase_options.dart';
 import 'Ui/Auth/Forgot_Password.dart';
 import 'Ui/HomePageScreen/Screens/Car_Detailes.dart';
 import 'Ui/HomePageScreen/Screens/HomePageScreen.dart';
 import 'Ui/Splash&Onboardning/OnBoardingScreen.dart';
-import 'Ui/Firebase/firebase_options.dart';
+
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
